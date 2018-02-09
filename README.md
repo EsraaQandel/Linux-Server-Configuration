@@ -167,7 +167,7 @@ and then add the following line right after the `<VirtualHost *:80>` element and
 		Order allow,deny
 		Allow from all
 	</Directory>
-	Alias /static /var/www//ItemCatalogProject/ItemCatalogProject/static
+	Alias /static /var/www/ItemCatalogProject/ItemCatalogProject/static
 	<Directory /var/www/ItemCatalogProject/ItemCatalogProject/static/>
 		Order allow,deny
 		Allow from all
