@@ -107,7 +107,7 @@ sudo pip install httplib2
 sudo pip install flask-seasurf
 ```
 
-- Install Git by 'sudo apt-get install git
+- Install Git by 'sudo apt-get install git`
 
 - Clone the repository by 
 ```
