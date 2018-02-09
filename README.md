@@ -68,7 +68,7 @@ by `sudo nano /etc/ssh/sshd_config` to change
 
 - Allow incoming connection for SSH on port 2200 by `sudo ufw allow 2200/tcp`
 
-- Allow incoming connections for HTTP on port by `sudo ufw allow www`
+- Allow incoming connections for HTTP on port by 80 `sudo ufw allow www`
 
 - Allow incoming connection for NTP on port 123 by `sudo ufw allow ntp`
 
