@@ -4,10 +4,10 @@ You will take a baseline installation of a Linux distribution on a virtual machi
 
 # Server details
 
-URL: [http://35.177.179.71/](http://35.177.179.71/)
+- URL: [http://35.177.179.71/](http://35.177.179.71/)
 SSH port: `2200`
 
-# In this project we used [Amazon Lightsail](https://lightsail.aws.amazon.com/) 
+- In this project we used [Amazon Lightsail](https://lightsail.aws.amazon.com/) 
 
 ## On the server side 
 
@@ -60,7 +60,7 @@ by `sudo nano /etc/ssh/sshd_config` to change
 
 ## Configure UFW 
 
-- Make sure 
+- Make sure to Change the open port for SSH from 22 to 2200 on the instance side. [read more](https://stackoverflow.com/questions/47342988/aws-ssh-port-timeout-after-changing-port-number)
 
 - block all incoming connections on all ports by `sudo ufw default deny incoming`
 
@@ -96,3 +96,91 @@ postgres:~$ exit
 
 ```
 
+- Install requirements by 
+
+```
+sudo apt-get install python-psycopg2 python-flask
+sudo apt-get install python-sqlalchemy python-pip
+sudo pip install oauth2client
+sudo pip install requests
+sudo pip install httplib2
+sudo pip install flask-seasurf
+```
+
+- Install Git by 'sudo apt-get install git
+
+- Clone the repository by 
+```
+cd /var/www
+sudo mkdir ItemCatalogProject
+sudo chown -R grader:grader ItemCatalogProject
+cd ItemCatalogProject
+sudo git clone https://github.com/EsraaQandel/Item-Catalog-Project.git ItemCatalogProject
+```
+
+- edits to the cloned app 
+
+1- change `postgresql://postgres:postgres@localhost/sportsapp` to `postgresql://catalog:catalog@localhost/catalogdb` in project.py
+by `sudo nano /var/www/ItemCatalogProject/ItemCatalogProject/project.py` then add the full path to client_secrets.json file  to `/var/www/ItemCatalogProject/ItemCatalogProject/client_secrets.json`
+
+2- change `postgresql://postgres:postgres@localhost/sportsapp` to `postgresql://catalog:catalog@localhost/catalogdb` in database_setup.py
+by `sudo nano /var/www/ItemCatalogProject/ItemCatalogProject/database_setup.py`
+
+3- change `postgresql://postgres:postgres@localhost/sportsapp` to `postgresql://catalog:catalog@localhost/catalogdb` in filldb.py
+by `sudo nano /var/www/ItemCatalogProject/ItemCatalogProject/filldb.py`
+
+4- Configure Google OAuth by adding the public IP address of your server to the “Authorized javascript origins”
+
+5- In the `project.py` file, there was an extra space the drove me crazy for two days and ruined the home page make sure to remove it from  the project.py here
+
+ ```  
+  return render_template(
+        'categories.html ',
+        categories=categories,
+        LatestItems=LatestItems,
+        loggedIn=loggedIn)
+```
+
+- Create the web application WSGI file by `sudo nano /var/www/ItemCatalogProject/app.wsgi`
+
+- Add the following lines to the file, and save 
+
+```
+#!/usr/bin/python
+import sys 
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0,"/var/www/ItemCatalogProject/")
+from project import app as application
+application.secret_key = 'super_secret_key'
+
+```
+
+- Update the Apache configuration file by `sudo nano /etc/apache2/sites-enabled/000-default.conf`
+and then add the following line right after the `<VirtualHost *:80>` element and save:
+
+```
+    ServerName 35.177.179.71
+	ServerAdmin esraamedhatesamir@gmail.com
+	WSGIScriptAlias / /var/www/ItemCatalogProject/app.wsgi
+	<Directory /var/www/ItemCatalogProject/ItemCatalogProject>
+		Order allow,deny
+		Allow from all
+	</Directory>
+	Alias /static /var/www//ItemCatalogProject/ItemCatalogProject/static
+	<Directory /var/www/ItemCatalogProject/ItemCatalogProject/static/>
+		Order allow,deny
+		Allow from all
+	</Directory>
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	LogLevel warn
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+```
+
+- Restart Apache by `sudo apache2ctl restart` 
+
+
+# Refrences:
+
+-[Hosting your Python Application using Flask and Amazon Web Services (AWS)](http://amunategui.github.io/idea-to-pitch/)
+- **Special Thanks to my frined *[Basma](https://github.com/basmaashouur)* for a very helpful README**
